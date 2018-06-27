@@ -12,12 +12,22 @@ namespace RepoGenerator
             "Repo.cs"
         );
 
+        private readonly string debuggerBreak = "\t\tDebugger.Break();" + Environment.NewLine + "\t\t";
+        private readonly string debugWriteLine = "Debug.WriteLine(ex);" + Environment.NewLine;
+
         private readonly string method = @"
         public static {0} {1}{2}({3} {4})
         {{
-            using (var model = new DataModel())
+            try 
             {{
-                {5}
+                using (var model = new {5}())
+                {{
+                    {6}
+                }}
+            }}
+            catch (Exception ex) 
+            {{ 
+                {7}{8}{9}
             }}
         }}
 
@@ -38,8 +48,24 @@ namespace RepoGenerator
 
             txtClassList.Clear();
             foreach (var file in files)
+            {
+                if (file.IndexOf("Model", StringComparison.OrdinalIgnoreCase) >= 0)
+                    txtModelName.Text = Path.GetFileNameWithoutExtension(file);
+
                 txtClassList.AppendText(Path.GetFileName(file) + Environment.NewLine);
+            }
         }
+
+        private string GetModelName()
+            => string.IsNullOrEmpty(txtModelName.Text) ? "DataModel" : txtModelName.Text;
+
+        private string GetDebuggerBreak() => cbDebuggerBreak.Checked
+            ? debuggerBreak
+            : "";
+
+        private string GetDebugWriteLine() => cbDebugException.Checked
+            ? debugWriteLine
+            : "";
 
         private void btnGenerate_Click(object sender, EventArgs e)
         {
@@ -56,16 +82,20 @@ namespace RepoGenerator
                 var paramName = char.ToLower(className[0]) + className.Substring(1);
 
                 create += string.Format(method,
-                    "void",
+                    "bool",
                     "Add",
                     className,
                     className,
                     paramName,
+                    GetModelName(),
                     $@"
                 model.{className}s.Add({paramName});
 
-                model.SaveChanges();
-                    "
+                return model.SaveChanges() > 0;
+                    ",
+                    GetDebugWriteLine(),
+                    GetDebuggerBreak(),
+                    "return false;"
                 );
 
                 retreive += string.Format(method,
@@ -74,7 +104,11 @@ namespace RepoGenerator
                     className,
                     "int",
                     "id",
-                    $"return model.{className}s.Find(id);"
+                    GetModelName(),
+                    $"return model.{className}s.Find(id);",
+                    GetDebugWriteLine(),
+                    GetDebuggerBreak(),
+                    "return null;"
                 );
 
                 retreiveInBulk += string.Format(method,
@@ -83,7 +117,11 @@ namespace RepoGenerator
                     $"{className}s",
                     "",
                     "",
-                    $"return model.{className}s.ToList();"
+                    GetModelName(),
+                    $"return model.{className}s.ToList();",
+                    GetDebugWriteLine(),
+                    GetDebuggerBreak(),
+                    "return null;"
                 );
 
                 update += string.Format(method,
@@ -92,11 +130,15 @@ namespace RepoGenerator
                     className,
                     className,
                     paramName,
+                    GetModelName(),
                     $@"
                 model.{className}s.Update({paramName});
 
                 return model.SaveChanges() > 0;
-                    "
+                    ",
+                    GetDebugWriteLine(),
+                    GetDebuggerBreak(),
+                    "return false;"
                 );
 
                 delete += string.Format(method,
@@ -105,15 +147,21 @@ namespace RepoGenerator
                     className,
                     "int",
                     "id",
+                    GetModelName(),
                     $@"
                 model.{className}s.Remove(model.{className}s.Find(id));
                         
                 return model.SaveChanges() > 0;
-                    "
+                    ",
+                    GetDebugWriteLine(),
+                    GetDebuggerBreak(),
+                    "return false;"
                 );
 
-                File.WriteAllText(destinationPath, string.Join(Environment.NewLine, create, retreiveInBulk, retreive, update, delete));
             }
+
+            File.WriteAllText(destinationPath, string.Join(Environment.NewLine, create, retreiveInBulk, retreive, update, delete));
+            System.Diagnostics.Process.Start("notepad.exe", destinationPath);
         }
     }
 }

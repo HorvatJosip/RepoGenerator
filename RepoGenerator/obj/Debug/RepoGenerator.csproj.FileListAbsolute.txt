@@ -1,0 +1,9 @@
+C:\Users\programer10\Desktop\RepoGenerator\RepoGenerator\bin\Debug\RepoGenerator.exe.config
+C:\Users\programer10\Desktop\RepoGenerator\RepoGenerator\bin\Debug\RepoGenerator.exe
+C:\Users\programer10\Desktop\RepoGenerator\RepoGenerator\bin\Debug\RepoGenerator.pdb
+C:\Users\programer10\Desktop\RepoGenerator\RepoGenerator\obj\Debug\RepoGenerator.csprojResolveAssemblyReference.cache
+C:\Users\programer10\Desktop\RepoGenerator\RepoGenerator\obj\Debug\RepoGenerator.MainForm.resources
+C:\Users\programer10\Desktop\RepoGenerator\RepoGenerator\obj\Debug\RepoGenerator.Properties.Resources.resources
+C:\Users\programer10\Desktop\RepoGenerator\RepoGenerator\obj\Debug\RepoGenerator.csproj.GenerateResource.Cache
+C:\Users\programer10\Desktop\RepoGenerator\RepoGenerator\obj\Debug\RepoGenerator.exe
+C:\Users\programer10\Desktop\RepoGenerator\RepoGenerator\obj\Debug\RepoGenerator.pdb
